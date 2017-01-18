@@ -100,7 +100,9 @@
 
 如果你尝试了网上的其他办法都没有效果，你可以往这方面想想，是否是因为本机或者路由器上安装过这方面的软件。
 接下来我想分享一下在遇到这个问题的时候我是怎么一步一步找到解决办法的">
-<meta property="og:updated_time" content="2017-01-17T16:08:39.440Z">
+<meta property="og:image" content="http://blog.lonffrey.com/2017/01/17/无法使用SSH方式push代码到github远程库的问题/add_SSH_key_on_GitHub.png">
+<meta property="og:image" content="http://blog.lonffrey.com/2017/01/17/无法使用SSH方式push代码到github远程库的问题/SSH.png">
+<meta property="og:updated_time" content="2017-01-18T10:54:08.899Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="无法使用SSH方式push代码到github远程库的问题">
 <meta name="twitter:description" content="前两天在学习廖雪峰老师的git教程时，在将本地代码push到GitHub库的时候失败了。尝试过几次之后，我确定自己没有敲错任何命令。经过一番折腾之后终于找到了问题的原因:
@@ -109,6 +111,7 @@
 
 如果你尝试了网上的其他办法都没有效果，你可以往这方面想想，是否是因为本机或者路由器上安装过这方面的软件。
 接下来我想分享一下在遇到这个问题的时候我是怎么一步一步找到解决办法的">
+<meta name="twitter:image" content="http://blog.lonffrey.com/2017/01/17/无法使用SSH方式push代码到github远程库的问题/add_SSH_key_on_GitHub.png">
 
 
 
@@ -393,9 +396,9 @@
 <ol>
 <li><p>首先按照廖老师在<a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/001374385852170d9c7adf13c30429b9660d0eb689dd43a000" target="_blank" rel="external">远程仓库</a>这一小节的代码将SSH Key创建成功（在~/.ssh目录下生成<strong>id_rsa</strong>和<strong>id_rsa.pub</strong>两个文件），并且在 github 上把你的公钥设置好</p>
  <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ssh-keygen -t rsa -C <span class="string">"youremail@example.com"</span></div></pre></td></tr></table></figure>
- </li>
+ <img src="/2017/01/17/无法使用SSH方式push代码到github远程库的问题/add_SSH_key_on_GitHub.png" alt="在github上添加SSH KEY" title="在github上添加SSH KEY"></li>
 <li><p>然后在<a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/0013752340242354807e192f02a44359908df8a5643103a000" target="_blank" rel="external">添加远程库</a>小节中按操作把你 github 上的库与你本地的库进行关联。注意，是SSH模式哦</p>
- 
+ <img src="/2017/01/17/无法使用SSH方式push代码到github远程库的问题/SSH.png" alt="Clone项目时选择SSH方式" title="Clone项目时选择SSH方式">
 <p> 如果关联错误可以使用一下命令移除远程库的绑定，然后在重新绑定</p>
  <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ git remote rm origin</div></pre></td></tr></table></figure>
 </li>
