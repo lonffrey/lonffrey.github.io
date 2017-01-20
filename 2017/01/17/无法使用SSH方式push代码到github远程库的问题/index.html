@@ -408,11 +408,11 @@
 <li><p>接下来就是按照绑定远程库的代码进行执行了</p>
  <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git remote add origin 你自己的远程库SSH地址</div><div class="line">$ git push -u origin master</div></pre></td></tr></table></figure>
 <p> 但是就是在这一步就出错了。出错信息为：</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Permission denied (publickey).</div><div class="line">fatal: Could not read from remote repository.</div><div class="line"></div><div class="line">Please make sure you have the correct access rights</div><div class="line">and the repository exists.</div></pre></td></tr></table></figure>
+ <figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Permission denied (publickey).</div><div class="line">fatal: Could <span class="keyword">not</span> <span class="built_in">read</span> <span class="built_in">from</span> remote repository.</div><div class="line"></div><div class="line">Please make sure you have <span class="keyword">the</span> correct access rights</div><div class="line"><span class="keyword">and</span> <span class="keyword">the</span> repository exists.</div></pre></td></tr></table></figure>
 <p> 在确定以上操作都是按照廖老师的教程一步一来的，并且没有敲错代码。我开始拿着上面出错信息的关键字在百度上搜索。一大堆资料试过了很多都没解决。突然看到<a href="http://blog.csdn.net/sunnyboychina/article/details/52576318" target="_blank" rel="external">Git连接Github是遇到的问题</a>这篇文章，虽然没有直接解决我的问题，但是我了解到了SSH的debug命令</p>
  <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh -T -v git@github.com</div></pre></td></tr></table></figure>
 <p> 获取到以下log信息：</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">debug1: Reading configuration data /etc/ssh/ssh_config</div><div class="line">debug1: /etc/ssh/ssh_config line 21: Applying options for *</div><div class="line">debug1: Connecting to github.com [1.111.11.111] port 22.</div><div class="line">debug1: Connection established.</div><div class="line">debug1: identity file /Users/yangzhongjing/.ssh/id_rsa type 1</div><div class="line">debug1: key_load_public: No such file or directory</div><div class="line">debug1: identity file /Users/yangzhongjing/.ssh/id_rsa-cert type -1</div><div class="line">debug1: key_load_public: No such file or directory</div><div class="line">debug1: identity file /Users/yangzhongjing/.ssh/id_dsa type -1</div><div class="line">debug1: key_load_public: No such file or directory</div><div class="line">debug1: identity file /Users/yangzhongjing/.ssh/id_dsa-cert type -1</div><div class="line">......</div></pre></td></tr></table></figure>
+ <figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="string">debug1:</span> Reading configuration data <span class="regexp">/etc/</span>ssh/ssh_config</div><div class="line"><span class="string">debug1:</span> <span class="regexp">/etc/</span>ssh/ssh_config line <span class="number">21</span>: Applying options <span class="keyword">for</span> *</div><div class="line"><span class="string">debug1:</span> Connecting to github.com [<span class="number">1.111</span><span class="number">.11</span><span class="number">.111</span>] port <span class="number">22.</span></div><div class="line"><span class="string">debug1:</span> Connection established.</div><div class="line"><span class="string">debug1:</span> identity file <span class="regexp">/Users/</span>yangzhongjing<span class="regexp">/.ssh/</span>id_rsa type <span class="number">1</span></div><div class="line"><span class="string">debug1:</span> <span class="string">key_load_public:</span> No such file or directory</div><div class="line"><span class="string">debug1:</span> identity file <span class="regexp">/Users/</span>yangzhongjing<span class="regexp">/.ssh/</span>id_rsa-cert type <span class="number">-1</span></div><div class="line"><span class="string">debug1:</span> <span class="string">key_load_public:</span> No such file or directory</div><div class="line"><span class="string">debug1:</span> identity file <span class="regexp">/Users/</span>yangzhongjing<span class="regexp">/.ssh/</span>id_dsa type <span class="number">-1</span></div><div class="line"><span class="string">debug1:</span> <span class="string">key_load_public:</span> No such file or directory</div><div class="line"><span class="string">debug1:</span> identity file <span class="regexp">/Users/</span>yangzhongjing<span class="regexp">/.ssh/</span>id_dsa-cert type <span class="number">-1</span></div><div class="line">......</div></pre></td></tr></table></figure>
 <p> 注意log中把github.com的IP地址识别成了1.111.11.111，一看就感觉IP不正确。所以马上搜索“debug1: Connecting to github.com [1.111.11.111] port 22.”便知道了我最终的答案 <a href="http://www.codes51.com/itwd/4108199_2.html" target="_blank" rel="external">ssh_exchange_identification: Connection closed by remote host 报错(2/2)</a>。看到这里我才想起之前买的极路由上有很多插件，我安装着玩儿，按了一些没有用的插件。登陆上去卸载后便安装好了</p>
 </li>
 </ol>
@@ -436,6 +436,27 @@
     <div>
       
         
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div><i class="fa fa-heart" aria-hidden="true"></i> Donate</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}" title="小额捐赠，以鼓励作者写出更多原创分享">
+      <span>捐赠</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/images/wechat.jpg" alt="Lonffrey Tu WeChat Pay"/>
+          <p>微信捐赠</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/images/alipay.jpg" alt="Lonffrey Tu Alipay"/>
+          <p>支付宝捐赠</p>
+        </div>
+      
+    </div>
+  </div>
+
 
       
     </div>
@@ -582,6 +603,17 @@
         
 
         <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="mailto:lovetulong@163.com" target="_blank" title="E-mail">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  E-mail
+                </a>
+              </span>
+            
           
         </div>
 
