@@ -375,40 +375,20 @@
       
         
           
-            <p>前两天在学习<a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/" target="_blank" rel="external">廖雪峰老师的git教程</a>时，在将本地代码push到GitHub库的时候失败了。尝试过几次之后，我确定自己没有敲错任何命令。经过一番折腾之后终于找到了问题的原因:</p>
-<blockquote>
-<p>路由器或电脑上安装了网络加速器，卸载之后就正常了</p>
-</blockquote>
-<p>如果你尝试了网上的其他办法都没有效果，你可以往这方面想想，是否是因为本机或者路由器上安装过这方面的软件。</p>
-<p>接下来我想分享一下在遇到这个问题的时候我是怎么一步一步找到解决办法的：</p>
-<ol>
-<li><p>首先按照廖老师在<a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/001374385852170d9c7adf13c30429b9660d0eb689dd43a000" target="_blank" rel="external">远程仓库</a>这一小节的代码将SSH Key创建成功（在~/.ssh目录下生成<strong>id_rsa</strong>和<strong>id_rsa.pub</strong>两个文件），并且在 github 上把你的公钥设置好</p>
- <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ssh-keygen -t rsa -C <span class="string">"youremail@example.com"</span></div></pre></td></tr></table></figure>
- <img src="/2017/01/17/无法使用SSH方式push代码到github远程库的问题/add_SSH_key_on_GitHub.png" alt="在github上添加SSH KEY" title="在github上添加SSH KEY"></li>
-<li><p>然后在<a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/0013752340242354807e192f02a44359908df8a5643103a000" target="_blank" rel="external">添加远程库</a>小节中按操作把你 github 上的库与你本地的库进行关联。注意，是SSH模式哦</p>
- <img src="/2017/01/17/无法使用SSH方式push代码到github远程库的问题/SSH.png" alt="Clone项目时选择SSH方式" title="Clone项目时选择SSH方式">
-<p> 如果关联错误可以使用一下命令移除远程库的绑定，然后在重新绑定</p>
- <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ git remote rm origin</div></pre></td></tr></table></figure>
-</li>
-<li><p>接下来就是按照绑定远程库的代码进行执行了</p>
- <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git remote add origin 你自己的远程库SSH地址</div><div class="line">$ git push -u origin master</div></pre></td></tr></table></figure>
-<p> 但是就是在这一步就出错了。出错信息为：</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Permission denied (publickey).</div><div class="line">fatal: Could not read from remote repository.</div><div class="line"></div><div class="line">Please make sure you have the correct access rights</div><div class="line">and the repository exists.</div></pre></td></tr></table></figure>
-<p> 在确定以上操作都是按照廖老师的教程一步一来的，并且没有敲错代码。我开始拿着上面出错信息的关键字在百度上搜索。一大堆资料试过了很多都没解决。突然看到<a href="http://blog.csdn.net/sunnyboychina/article/details/52576318" target="_blank" rel="external">Git连接Github是遇到的问题</a>这篇文章，虽然没有直接解决我的问题，但是我了解到了SSH的debug命令</p>
- <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh -T -v git@github.com</div></pre></td></tr></table></figure>
-<p> 获取到以下log信息：</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">debug1: Reading configuration data /etc/ssh/ssh_config</div><div class="line">debug1: /etc/ssh/ssh_config line 21: Applying options for *</div><div class="line">debug1: Connecting to github.com [1.111.11.111] port 22.</div><div class="line">debug1: Connection established.</div><div class="line">debug1: identity file /Users/yangzhongjing/.ssh/id_rsa type 1</div><div class="line">debug1: key_load_public: No such file or directory</div><div class="line">debug1: identity file /Users/yangzhongjing/.ssh/id_rsa-cert type -1</div><div class="line">debug1: key_load_public: No such file or directory</div><div class="line">debug1: identity file /Users/yangzhongjing/.ssh/id_dsa type -1</div><div class="line">debug1: key_load_public: No such file or directory</div><div class="line">debug1: identity file /Users/yangzhongjing/.ssh/id_dsa-cert type -1</div><div class="line">......</div></pre></td></tr></table></figure>
-<p> 注意log中把github.com的IP地址识别成了1.111.11.111，一看就感觉IP不正确。所以马上搜索“debug1: Connecting to github.com [1.111.11.111] port 22.”便知道了我最终的答案 <a href="http://www.codes51.com/itwd/4108199_2.html" target="_blank" rel="external">ssh_exchange_identification: Connection closed by remote host 报错(2/2)</a>。看到这里我才想起之前买的极路由上有很多插件，我安装着玩儿，按了一些没有用的插件。登陆上去卸载后便安装好了</p>
-</li>
-</ol>
-<p>总结一下：</p>
-<ol>
-<li>SSH是要使用整个网络，任何一个网络设备上的问题也可能导致连接不上。所以解决这个问题的时候可能就不止只考虑自己电脑上的问题了。</li>
-<li>解决问题时，需要找关键信息搜索</li>
-</ol>
-<p>最后还是帮廖雪峰老师打个广告（虽然不知道有多少人能点击这个链接，但是还是愿意尽自己微薄之力），学习完了<a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000" target="_blank" rel="external">廖老师的git教程</a>，感觉是个非常好的教程。分享给需要的人</p>
+          前两天在学习廖雪峰老师的git教程时，在将本地代码push到GitHub库的时候失败了。尝试过几次之后，我确定自己没有敲错任何命令。经过一番折腾之后终于找到了问题的原因:
 
-          
+路由器或电脑上安装了网络加速器，卸载之后就正常了
+
+如果你尝试了网上的其他办法都没有效果，你可以往这方面想想，是否是因为本机或者路由器上安装过这方面的软件。
+接下来我
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/01/17/无法使用SSH方式push代码到github远程库的问题/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -546,9 +526,16 @@
       
         
           
-            <p>幸亏是周末能够抽得出时间，写这篇文章已经是凌晨三点四十分。<br>其实很早就有想法在某个blog平台上开一个账号，偶尔写写平时遇到的技术难题的解决办法。<br>这次是在学习git的时候发现了gitbug pages这个好东西。好了，不废话了。希望自己能够坚持下去吧……以后慢慢更新文章，2017年1月14号，呃……是15号，是值得纪念的日子</p>
+          幸亏是周末能够抽得出时间，写这篇文章已经是凌晨三点四十分。其实很早就有想法在某个blog平台上开一个账号，偶尔写写平时遇到的技术难题的解决办法。这次是在学习git的时候发现了gitbug pages这个好东西。好了，不废话了。希望自己能够坚持下去吧……以后慢慢更新文章，2017年1月14号，呃……是15号，是值得纪念的日子
 
           
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/01/15/第一篇文章/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -648,6 +635,17 @@
         
 
         <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="mailto:lovetulong@163.com" target="_blank" title="E-mail">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  E-mail
+                </a>
+              </span>
+            
           
         </div>
 
